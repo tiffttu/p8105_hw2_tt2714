@@ -1,0 +1,27 @@
+---
+title: "p8105_hw2_tt2714"
+author: "Tiffany Tu"
+date: "9/30/2018"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+## Problem 1
+### Data import and cleaning 
+Retain line, station, name, station latitude / longitude, routes served, entrance type, entry, vending, and ADA compliance.
+```{r data import 1, message=FALSE}
+nyc_transit = read_csv(file = "./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>% 
+  janitor::clean_names() %>% 
+  select(-division, -exit_only, -staffing, -staff_hours, -ada_notes, -free_crossover:-entrance_location)
+
+head(nyc_transit)
+```
+
+## Problem 2
+
+
+## Problem 3
