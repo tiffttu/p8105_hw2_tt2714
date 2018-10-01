@@ -8,17 +8,47 @@ output: github_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+library(data.table)
 ```
 
 ## Problem 1
-### Data import and cleaning 
-Retain line, station, name, station latitude / longitude, routes served, entrance type, entry, vending, and ADA compliance.
+#### Data import and cleaning 
+This dataset contains information on New York City transit lines, station names, station latitude and longitude, routes served, type of entry, available entry, available vending machine, and ADA compliance. My data cleaning steps include cleaning all column names with janitor, selecting only wanted columns of the dataset, and converting the entry column from yes/no to logical variables.  
+  
+The dimension of the dataset is 1868 x 19. It is not tidy because there is too much overlapping information in the columns. It is unclear how many distinct transit lines, stations, or routes there are in the system, making it difficult to analyze and to find relevant information. The station latitude/longitude columns also give repetitive data. 
 ```{r data import 1, message=FALSE}
 nyc_transit = read_csv(file = "./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>% 
   janitor::clean_names() %>% 
-  select(-division, -exit_only, -staffing, -staff_hours, -ada_notes, -free_crossover:-entrance_location)
+  select(-division, -exit_only, -staffing, -staff_hours, -ada_notes, -free_crossover:-entrance_location) %>% 
+  replace(., is.na(.), "") %>% 
+  unite(route, route1:route11, sep = " ") %>% 
+  mutate(entry = ifelse(entry == "YES", TRUE, FALSE)) %>% 
+  mutate(vending = ifelse(vending == "YES", TRUE, FALSE))
 
 head(nyc_transit)
+````
+
+#### Distinct Stations: 
+```{r}
+station_nyc_transit = distinct(nyc_transit, station_name, route, .keep_all = TRUE)
+nrow(station_nyc_transit)
+```
+
+#### How many stations are ADA compliant?
+```{r}
+length(which(station_nyc_transit$ada == TRUE))
+```
+
+#### Proportion of station entrances/exits without vending allow entrance
+```{r}
+length(which(station_nyc_transit$vending == FALSE))/length(which(station_nyc_transit$entry == TRUE))
+```
+
+#### Distinct stations serve the A train? ADA compliant?
+```{r}
+Atrain_stations = station_nyc_transit[grep("A", station_nyc_transit$route), ]
+nrow(Atrain_stations)
+length(which(Atrain_stations$ada == TRUE))
 ```
 
 ## Problem 2
