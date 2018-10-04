@@ -95,7 +95,7 @@ trashwheel_1617
 ```
 
 #### Key Variables
-Total precipitation for 2017 is `r sum(trashwheel_2017[, 3])`. The median number of sports balls in a dumpster in 2016 is .
+Total precipitation for 2017 is `r sum(trashwheel_2017[, 3])`. The median number of sports balls in a dumpster in 2016 is `r median(subset(trashwheel, year == 2016)$sports_balls, na.rm = TRUE)`.
 
 ## Problem 3
 Installation and library for BRFSS dataset
@@ -110,5 +110,20 @@ overallhealth_brfss_smart2010 = brfss_smart2010 %>%
   mutate(., excellent_or_verygood = rowSums(cbind(excellent, very_good)))
 
 head(overallhealth_brfss_smart2010)
+```
+
+There are `r length(unique(overallhealth_brfss_smart2010$locationabbr))` unique locations included in this dataset. Every state is included in this dataset, including District of Columbia. The most frequent occurence is `r max(overallhealth_brfss_smart2010$locationabbr)` out of all the states represented.  
+
+The median of the "Excellent" response value for 2002 is `r median(subset(overallhealth_brfss_smart2010, year == 2002)$excellent, na.rm = TRUE)`.
+
+```{r histogram}
+ggplot(subset(overallhealth_brfss_smart2010, year == 2002), aes(x = excellent)) + geom_histogram(binwidth = 2)
+```
+
+```{r scatterplot}
+nycounty = overallhealth_brfss_smart2010 %>% 
+  filter(locationdesc == "NY - New York County" | locationdesc == "NY - Queens County")
+
+ggplot(nycounty, aes(x = year, y = excellent)) + geom_point(aes(color = locationdesc))
 ```
 
